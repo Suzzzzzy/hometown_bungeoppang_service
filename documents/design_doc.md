@@ -14,11 +14,11 @@
 6. 로그아웃
 7. 회원 탈퇴
 
-## 로그인
+# 로그인
 - 카카오 로그인
 - 앱을 다운받아 처음 실행했을 때 카카오 로그인 버튼이 있다
 
-### API
+## API
 1. [Get] https://kauth.kakao.com/oauth/authorize
 - 인가 코드 받기
 - **Parameter**
@@ -55,7 +55,55 @@
   - `id`: Long/ 회원번호
   - `email`: String/ 이메일
 
-### DB
+## DB
 토큰에서 id, email 정보를 리턴 받아 DB에 저장한다
 - `user_id`: Long/ 카카오 회원 번호
 - `email`: Varchar/ 카카오 가입 이메일
+
+
+# 회원 정보 저장
+- 카카오 로그인 후 유저에게 추가 정보를 받아 저장
+- 닉네임 설정, 거래 지역 설정
+
+## 닉네임
+- string 타입으로 저장
+- 한글, 숫자로 10자 이내
+- 닉네임 중복 체크 -> '다음'버튼 누를 때 사용 불가능한(중복된) 닉네임이라면 '이미 사용중인 닉네임 입니다' 알림
+
+### API
+- 닉네임 작성 칸 밑에 '다음' 버튼에 해당
+- token 필요
+- 유저 정보는 token 에서 파싱
+- **Request**: `nickname` string
+- 체크 항목: 한글과 숫자 포함 10자 이내, 중복 확인
+- user_id로 데이터 조회하여 nickname 칼럼 업데이트
+
+## 거래 지역 설정
+- 사용자 입력값으로 설정
+- 시-구-동 세개의 칸으로 입력받음
+- **Request**: `area` string
+- user 테이블 area 칼럼에 '시 구 동' 순서로 한 칸 띄어쓰기 하여 저장
+- user_id로 데이터 조회하여 area 칼럼 업데이트
+
+
+# 중고거래 피드 작성
+
+<img width="250" alt="image" src="https://github.com/Suzzzzzy/transaction-app-service/assets/97580836/7015a75b-378d-4c10-a0f9-30fca59f5a4a">
+
+- 중고거래 피드 작성 저장
+- 사진은 한 장 저장
+
+## [POST] app/feed
+- **Header**
+  - token: 유저정보 파싱을 위함
+- **Body**
+  - `title`: varchar/ 제목
+  - `price`: float/ 가격
+  - `description`: varchar/ 설명
+  - `image`: file/ 사진 s3 url
+- **Response**
+  - title, price, description, image(s3 url), area(유저의 설정된 지역)
+
+## 이미지 업로드
+- AWS S3 서비스 이용
+- s3 uploader 작성 필요
