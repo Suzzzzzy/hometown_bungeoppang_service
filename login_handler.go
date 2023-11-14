@@ -2,14 +2,20 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
 	"net/http"
+	"os"
 )
 
 func loginHandler(c *gin.Context) {
 	kakaoURL := OauthConfig.AuthCodeURL("state", oauth2.AccessTypeOffline)
 	c.Redirect(http.StatusTemporaryRedirect, kakaoURL)
+
+	fmt.Println("CLIENT_ID:", os.Getenv("CLIENT_ID"))
+	fmt.Println("CLIENT_ID: ", OauthConfig.ClientID)
+
 }
 
 func callbackHandler(c *gin.Context) {
